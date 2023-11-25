@@ -5,8 +5,8 @@ function App() {
 
   return (
     <div>
-      <header className=" bg-slate-400">
-        <img src="/title.svg" alt="title" className="w-1/2 mx-auto" />
+      <header className=" bg-slate-400 h-40 sticky">
+        <img src="/title.svg" alt="title" className="m-auto" />
       </header>
       <Main />
       <footer></footer>

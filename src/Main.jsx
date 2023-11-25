@@ -1,24 +1,51 @@
-import ImageUploader from "./ImageUploader";
 import { useRef, useState } from "react";
-import { jsPDF } from "jspdf";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 function Main() {
   const [images, setImages] = useState([]);
-  const dialogRef = useRef(null);
+  const inputRef = useRef(null);
 
-  function setNewImage(url, name) {
-    setImages((current) => [...current, { url, name }]);
-  }
-
-  function generatePDF() {
-    const doc = new jsPDF();
-    images.forEach((image, index) => {
-      if (index !== 0) {
-        doc.addPage();
-      }
-      doc.addImage(image.url, "JPEG", 10, 10, 190, 277);
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files).map((file) => {
+      return { url: URL.createObjectURL(file), name: file.name };
     });
-    doc.save("magic_by_pdf_mage.pdf");
+    setImages((current) => [...current, ...files]);
+    inputRef.current.value = null;
+  };
+
+  async function generatePDF() {
+    const docDefinition = {
+      content: [],
+    };
+
+    for (const image of images) {
+      const response = await fetch(image.url);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        const base64data = reader.result;
+
+        if (docDefinition.content.length !== 0) {
+          docDefinition.content.push({ text: "", pageBreak: "after" });
+        }
+
+        docDefinition.content.push({
+          image: base64data,
+          width: 570,
+          height: 821,
+          absolutePosition: { x: 10, y: 10 },
+        });
+
+        if (docDefinition.content.length >= images.length) {
+          pdfMake.createPdf(docDefinition).download(`magic_by_pdf_mage_${getCurrentTime()}.pdf`);
+        }
+      };
+
+      reader.readAsDataURL(blob);
+    }
   }
 
   function handleImageDelete(index) {
@@ -45,28 +72,49 @@ function Main() {
     }
   }
 
-  function handleCloseDialog() {
-    dialogRef.current.close();
+  function getCurrentTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    return `${year}_${month}_${day}_${hours}_${minutes}_${seconds}`;
   }
 
   return (
     <main className="flex flex-col items-center w-full">
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-2"
-        onClick={() => dialogRef.current.showModal()}
-      >
-        Add image
-      </button>
-      <div className="flex flex-col md:flex-row h-11 md:flex-wrap relative w-[80%] gap-2">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="border border-gray-300 rounded-md p-2 mt-2 mb-3"
+        multiple
+      />
+      {images.length > 0 && (
+        <p className=" text-center p-1 bg-yellow-200 rounded mb-2 select-none shadow-sm shadow-black">
+          ⚠ Mobile pictures are rotated based on orientation in final pdf ⚠
+        </p>
+      )}
+      <div className="flex flex-col md:flex-row h-11 md:justify-center md:items-center md:flex-wrap relative w-[80%] gap-2">
         {images.map((image, index) => (
-          <div className="flex flex-col items-center p-3 border-2 rounded-md" key={index}>
-            <p className=" text-center text-2xl">{index + 1}</p>
-            <img src={image.url} alt={image.name} />
-            <div className="flex flex-row items-center">
-              <button onClick={() => handleImageDelete(index)}>❌</button>
-              <button onClick={() => moveImageForward(index)}>🔽</button>
-              <button onClick={() => moveImageBackward(index)}>🔼</button>
+          <div className="flex flex-col items-center p-3 border-2 rounded-md md:w-[60%]" key={index}>
+            <p className=" text-center text-2xl bg-slate-400 border-2 aspect-square w-10 select-none">{index + 1}</p>
+            <div className="flex flex-row items-center mb-2">
+              <button className=" text-2xl" onClick={() => handleImageDelete(index)}>
+                ❌
+              </button>
+              <button className=" text-2xl" onClick={() => moveImageForward(index)}>
+                🔽
+              </button>
+              <button className=" text-2xl" onClick={() => moveImageBackward(index)}>
+                🔼
+              </button>
             </div>
+            <img src={image.url} alt={image.name} />
           </div>
         ))}
       </div>
@@ -78,17 +126,6 @@ function Main() {
           Create PDF
         </button>
       )}
-      <dialog ref={dialogRef}>
-        <div className="p-3 rounded-md flex flex-col gap-2 items-center justify-center">
-          <ImageUploader setNewImage={setNewImage} close={handleCloseDialog} />
-          <button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-            onClick={handleCloseDialog}
-          >
-            Cancel
-          </button>
-        </div>
-      </dialog>
     </main>
   );
 }
