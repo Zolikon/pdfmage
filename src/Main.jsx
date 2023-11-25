@@ -1,8 +1,5 @@
 import { useRef, useState } from "react";
 import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 function Main() {
   const [images, setImages] = useState([]);
@@ -39,9 +36,10 @@ function Main() {
           absolutePosition: { x: 10, y: 10 },
         });
 
-        if (docDefinition.content.length >= images.length) {
+        if (images.length === 1 || docDefinition.content.length === images.length * 2 - 1) {
           pdfMake.createPdf(docDefinition).download(`magic_by_pdf_mage_${getCurrentTime()}.pdf`);
         }
+        console.log(docDefinition.content.length);
       };
 
       reader.readAsDataURL(blob);
@@ -89,7 +87,7 @@ function Main() {
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg, image/png"
         onChange={handleImageUpload}
         className="border border-gray-300 rounded-md p-2 mt-2 mb-3"
         multiple
