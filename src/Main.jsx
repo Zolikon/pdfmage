@@ -1,48 +1,35 @@
 import { useRef, useState } from "react";
-import pdfMake from "pdfmake/build/pdfmake";
+
+import Loader from "./Loader";
+import { generatePDF } from "./fileUtils";
 
 function Main() {
   const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
 
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files).map((file) => {
-      return { url: URL.createObjectURL(file), name: file.name };
-    });
-    setImages((current) => [...current, ...files]);
-    inputRef.current.value = null;
-  };
-
-  async function generatePDF() {
-    const docDefinition = {
-      content: [],
-    };
-
-    for (const image of images) {
-      const response = await fetch(image.url);
-      const blob = await response.blob();
-      const reader = new FileReader();
-      reader.onloadend = function () {
-        const base64data = reader.result;
-
-        if (docDefinition.content.length !== 0) {
-          docDefinition.content.push({ text: "", pageBreak: "after" });
-        }
-
-        docDefinition.content.push({
-          image: base64data,
-          width: 570,
-          height: 821,
-          absolutePosition: { x: 10, y: 10 },
-        });
-
-        if (images.length === 1 || docDefinition.content.length === images.length * 2 - 1) {
-          pdfMake.createPdf(docDefinition).download(`magic_by_pdf_mage_${getCurrentTime()}.pdf`);
-        }
-        console.log(docDefinition.content.length);
+  async function handleImageUpload(event) {
+    const newImages = Array.from(event.target.files).map(async (file) => {
+      const blob = await fetch(URL.createObjectURL(file)).then((response) => response.blob());
+      const blobUrl = URL.createObjectURL(blob);
+      return {
+        url: blobUrl,
+        name: file.name,
       };
+    });
+    Promise.all(newImages).then((values) => {
+      setImages((current) => [...current, ...values]);
+      inputRef.current.value = null;
+    });
+  }
 
-      reader.readAsDataURL(blob);
+  async function downloadPDF() {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    setLoading(true);
+    try {
+      await generatePDF(images);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -70,18 +57,6 @@ function Main() {
     }
   }
 
-  function getCurrentTime() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const seconds = String(now.getSeconds()).padStart(2, "0");
-
-    return `${year}_${month}_${day}_${hours}_${minutes}_${seconds}`;
-  }
-
   return (
     <main className="flex flex-col items-center w-full">
       <input
@@ -89,15 +64,16 @@ function Main() {
         type="file"
         accept="image/jpeg, image/png"
         onChange={handleImageUpload}
-        className="border border-gray-300 rounded-md p-2 mt-2 mb-3"
+        className="text-sm text-center
+          file:mr-5 file:py-1 file:px-3 file:border-1
+          file:text-md file:font-medium
+          file:bg-stone-50 file:text-stone-700
+          file:rounded hover:file:shadow-md hover:file:shadow-black
+          hover:file:cursor-pointer hover:file:bg-blue-50
+          my-3"
         multiple
       />
-      {images.length > 0 && (
-        <p className=" text-center p-1 bg-yellow-200 rounded mb-2 select-none shadow-sm shadow-black">
-          ⚠ Mobile pictures are rotated based on orientation in final pdf ⚠
-        </p>
-      )}
-      <div className="flex flex-col md:flex-row h-11 md:justify-center md:items-center md:flex-wrap relative w-[80%] gap-2">
+      <div className="flex flex-col md:flex-row h-11 md:justify-center md:items-center md:flex-wrap relative w-[80%] gap-2 mb-3">
         {images.map((image, index) => (
           <div className="flex flex-col items-center p-3 border-2 rounded-md md:w-[60%]" key={index}>
             <p className=" text-center text-2xl bg-slate-400 border-2 aspect-square w-10 select-none">{index + 1}</p>
@@ -117,13 +93,22 @@ function Main() {
         ))}
       </div>
       {images.length > 0 && (
-        <button
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded fixed bottom-3 right-3"
-          onClick={generatePDF}
-        >
-          Create PDF
-        </button>
+        <div className="flex flex-col gap-2 fixed bottom-3 right-3">
+          <button
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => setImages([])}
+          >
+            Clear
+          </button>
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            onClick={downloadPDF}
+          >
+            Create PDF
+          </button>
+        </div>
       )}
+      {loading && <Loader />}
     </main>
   );
 }
