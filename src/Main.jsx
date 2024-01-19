@@ -2,11 +2,13 @@ import { useRef, useState } from "react";
 
 import Loader from "./Loader";
 import { generatePDF } from "./fileUtils";
+import { QualitySelector } from "./QualitySelector";
 
 function Main() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
+  const [quality, setQuality] = useState("LOW");
 
   async function handleImageUpload(event) {
     const newImages = Array.from(event.target.files).map(async (file) => {
@@ -27,7 +29,7 @@ function Main() {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     setLoading(true);
     try {
-      await generatePDF(images);
+      await generatePDF(images, quality);
     } finally {
       setLoading(false);
     }
@@ -59,20 +61,23 @@ function Main() {
 
   return (
     <main className="flex flex-col items-center w-full">
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg, image/png"
-        onChange={handleImageUpload}
-        className="text-sm text-center
+      <div>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/jpeg, image/png"
+          onChange={handleImageUpload}
+          className="text-sm text-center
           file:mr-5 file:py-1 file:px-3 file:border-1
           file:text-md file:font-medium
           file:bg-stone-50 file:text-stone-700
           file:rounded hover:file:shadow-md hover:file:shadow-black
           hover:file:cursor-pointer hover:file:bg-blue-50
           my-3"
-        multiple
-      />
+          multiple
+        />
+        <QualitySelector quality={quality} setQuality={setQuality} />
+      </div>
       <div className="flex flex-col md:flex-row h-11 md:justify-center md:items-center md:flex-wrap relative w-[80%] gap-2 mb-3">
         {images.map((image, index) => (
           <div className="flex flex-col items-center p-3 border-2 rounded-md md:w-[60%]" key={index}>
