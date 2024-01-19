@@ -1,6 +1,12 @@
 import pdfMake from "pdfmake/build/pdfmake";
 
-async function rotateImage(base64data) {
+const qualityTypes = {
+  LOW: 0.1,
+  NORMAL: 0.5,
+  ORIGINAL: 1,
+};
+
+async function rotateImage(base64data, compression) {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
   const img = new Image();
@@ -22,7 +28,7 @@ async function rotateImage(base64data) {
           reader.readAsDataURL(blob);
         },
         "image/jpeg",
-        0.8 // Compression quality (0.0 - 1.0)
+        compression // Compression quality (0.0 - 1.0)
       );
     };
 
@@ -30,7 +36,7 @@ async function rotateImage(base64data) {
   });
 }
 
-async function preProcessFiles(images) {
+async function preProcessFiles(images, quality) {
   const files = images.map((image) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -38,7 +44,7 @@ async function preProcessFiles(images) {
         const base64data = reader.result;
 
         try {
-          const rotatedImage = await rotateImage(base64data);
+          const rotatedImage = await rotateImage(base64data, qualityTypes[quality]);
           resolve({
             rotatedImage: rotatedImage,
           });
@@ -57,11 +63,11 @@ async function preProcessFiles(images) {
   return Promise.all(files);
 }
 
-export async function generatePDF(images) {
+export async function generatePDF(images, quality) {
   const docDefinition = {
     content: [],
   };
-  const processedImages = await preProcessFiles(images);
+  const processedImages = await preProcessFiles(images, quality);
   for (const image of processedImages) {
     const base64data = image.rotatedImage;
 
