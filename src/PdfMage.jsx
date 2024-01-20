@@ -4,11 +4,11 @@ import Loader from "./Loader";
 import { generatePDF } from "./fileUtils";
 import { QualitySelector } from "./QualitySelector";
 
-function Main() {
+function PdfMage() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
-  const [quality, setQuality] = useState("LOW");
+  const [quality, setQuality] = useState("NORMAL");
 
   async function handleImageUpload(event) {
     const newImages = Array.from(event.target.files).map(async (file) => {
@@ -118,4 +118,4 @@ function Main() {
   );
 }
 
-export default Main;
+export default PdfMage;

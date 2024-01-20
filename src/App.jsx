@@ -1,4 +1,4 @@
-import Main from "./main";
+import PdfMage from "./PdfMage";
 
 function App() {
   document.title = "PDF Mage";
@@ -8,7 +8,7 @@ function App() {
       <header className=" bg-slate-400 h-40 sticky">
         <img src="/title.svg" alt="title" className="m-auto" />
       </header>
-      <Main />
+      <PdfMage />
       <footer></footer>
     </div>
   );
