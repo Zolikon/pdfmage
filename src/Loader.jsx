@@ -2,7 +2,7 @@ import styles from "./Loader.module.css";
 
 function Loader() {
   return (
-    <div className="absolute inset-0 bg-slate-200/20 flex flex-col items-center justify-center h-full w-full backdrop-blur-sm">
+    <div className="fixed inset-0 bg-slate-200/20 flex flex-col items-center justify-center h-vh w-vw backdrop-blur-sm">
       <p className=" border-2 border-black bg-slate-100 text-black p-2 mb-2 text-md font-bold select-none">
         Working...
       </p>
