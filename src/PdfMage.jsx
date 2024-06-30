@@ -86,7 +86,7 @@ function PdfMage() {
 
   return (
     <main className=" flex flex-col flex-grow items-center w-full h-4/5 overflow-y-auto bg-teal-100 py-3">
-      <div className="h-1/5">
+      <div className="h-2/5 my-2">
         <input
           ref={inputRef}
           type="file"
@@ -103,9 +103,12 @@ function PdfMage() {
         />
         <QualitySelector quality={quality} setQuality={setQuality} />
       </div>
-      <div className="flex flex-col flex-grow md:flex-row justify-center items-center md:flex-wrap relative gap-2">
+      <div className="flex flex-col flex-grow md:flex-row justify-center items-center md:flex-wrap relative gap-2 p-2">
         {images.map((image, index) => (
-          <div className="flex flex-col items-center p-3 border-4 rounded-xl h-[600px] w-[500px]" key={index}>
+          <div
+            className="flex flex-col items-center p-3 border-4 rounded-xl xl:h-[600px] xl:w-[500px] w-4/5 aspect-square"
+            key={index}
+          >
             <div className="flex gap-2 items-center justify-center">
               <p className=" text-center text-2xl bg-green-400 border-2 aspect-square w-10 select-none rounded-lg">
                 {index + 1}
@@ -123,7 +126,7 @@ function PdfMage() {
         ))}
       </div>
       {images.length > 0 && (
-        <div className="flex flex-col gap-2 fixed bottom-[60px] right-[40px]">
+        <div className="flex flex-col gap-2 fixed right-[20px] bottom-[60px] sm:right-[40px] w-[100px] sm:w-[200px]">
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={scrollToTop}
