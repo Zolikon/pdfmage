@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 export function QualitySelector({ quality, setQuality }) {
   return (
-    <div className="flex flex-col items-center border-1 rounded-md m-2 p-2 bg-red-400 w-full">
+    <div className="flex flex-col items-center border-1 rounded-md m-2 p-2 bg-[#699de7] w-full">
       <p className="text-center font-extrabold text-xl select-none">Output quality</p>
       <div className="flex gap-2 justify-evenly m-2">
         <QualityLabel name="LOW" currentSelected={quality} setQuality={setQuality} />

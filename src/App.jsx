@@ -14,18 +14,19 @@ function App() {
 
   return (
     <div className="flex flex-col h-full w-full">
-      <header className=" bg-gradient-to-b from-red-500 to-yellow-400 h-1/6 flex items-center justify-center">
-        <img src="/title.svg" alt="title" className="m-auto" />
+      <header className=" bg-gradient-to-b from-[#778599] to-[#699de7] h-1/6 flex items-center justify-center">
+        <img src="/logo.png" className="h-4/5 rounded-3xl" />
+        <img src="/title.svg" alt="title" className="" />
       </header>
       <PdfMage />
-      <footer className="bg-gradient-to-t from-red-500 to-yellow-400  h-[40px] flex items-center justify-end px-3 text-stone-200">
+      <footer className="bg-gradient-to-t from-[#699de7] to-[#778599]  h-[40px] flex items-center justify-end px-3 text-stone-200">
         <button onClick={openDialog} className="mx-5">
           About
         </button>
         <p>PDF Mage | 2024</p>
       </footer>
       <dialog ref={dialogRef}>
-        <div className="h-[80vh] w-[80vw] p-3 flex flex-col items-center justify-between bg-gradient-to-b from-red-500 to-yellow-400">
+        <div className="h-[80vh] w-[80vw] p-3 flex flex-col items-center justify-between bg-gradient-to-b bg-[#699de7]">
           <img src="/title.svg" alt="title" className="h-1/5" />
           <div className="font-semibold flex-grow text-2xl px-12">
             <p className="pb-4">
@@ -38,14 +39,14 @@ function App() {
               Original quality can result in quite big output PDF. On the other hand if we talk about documents low
               quality should be enough.
             </p>
-            <p className="flex border-2 m-2 p-2 border-stone-800 rounded-lg">
+            <p className="flex border-2 m-2 p-2 border-stone-800 rounded-lg hover:border-4">
               <p className="font-extrabold pr-4">IMPORTANT</p>
               <p>
                 The application does not store the uploaded images in any way, the images never even leave your browser.
               </p>
             </p>
           </div>
-          <button className="bg-red-500 p-2 px-4 rounded-lg text-yellow-400" onClick={closeDialog}>
+          <button className="bg-red-500 p-2 px-4 rounded-lg text-stone-200" onClick={closeDialog}>
             Close
           </button>
         </div>
