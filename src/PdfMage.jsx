@@ -9,6 +9,7 @@ function PdfMage() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
+  const anchroRef = useRef(null);
   const [quality, setQuality] = useState("NORMAL");
 
   async function handleImageUpload(event) {
@@ -81,27 +82,28 @@ function PdfMage() {
   }
 
   function scrollToTop() {
-    inputRef.current.scrollIntoView({ behavior: "smooth" });
+    anchroRef.current.scrollIntoView({ behavior: "smooth" });
   }
 
   return (
-    <main className=" flex flex-col flex-grow items-center w-full h-4/5 overflow-y-auto bg-teal-100 py-3">
-      <div className="h-2/5 my-2">
+    <main className=" flex flex-col flex-grow items-center w-full overflow-y-auto bg-teal-100 py-3">
+      <div ref={anchroRef} />
+      <div className="flex flex-col gap-2 items-center justify-center w-4/5 md:w-[300px]">
+        <button
+          className="bg-green-600 text-stone-200 border-double p-2 w-10 h-10 hover:scale-110 transition-all duration-300 rounded-full flex items-center justify-center"
+          onClick={() => inputRef.current.click()}
+        >
+          <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
+        </button>
         <input
           ref={inputRef}
           type="file"
           accept="image/jpeg, image/png"
           onChange={handleImageUpload}
-          className="text-sm text-center
-          file:mr-5 file:py-1 file:px-3 file:border-1
-          file:text-md file:font-medium
-          file:bg-stone-50 file:text-stone-700
-          file:rounded hover:file:shadow-md hover:file:shadow-black
-          hover:file:cursor-pointer hover:file:bg-blue-50
-          my-3"
+          className="hidden"
           multiple
         />
-        <QualitySelector quality={quality} setQuality={setQuality} />
+        {images.length > 0 && <QualitySelector quality={quality} setQuality={setQuality} />}
       </div>
       <div className="flex flex-col flex-grow md:flex-row justify-center items-center md:flex-wrap relative gap-2 p-2">
         {images.map((image, index) => (
@@ -126,24 +128,24 @@ function PdfMage() {
         ))}
       </div>
       {images.length > 0 && (
-        <div className="flex flex-col gap-2 fixed right-[20px] bottom-[60px] sm:right-[40px] w-[100px] sm:w-[200px]">
+        <div className="flex flex-col gap-2 fixed right-2 bottom-8">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white w-12 h-12 font-bold p-2 rounded-full material-symbols-outlined text-2xl"
             onClick={scrollToTop}
           >
-            Scroll to Top
+            arrow_upward
           </button>
           <button
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-red-500 hover:bg-red-700 text-white w-12 h-12 font-bold p-2 rounded-full material-symbols-outlined text-2xl"
             onClick={() => setImages([])}
           >
-            Clear
+            delete
           </button>
           <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-green-500 hover:bg-green-700 text-white w-12 h-12 font-bold p-2 rounded-full material-symbols-outlined text-2xl"
             onClick={downloadPDF}
           >
-            Create PDF
+            download
           </button>
         </div>
       )}
